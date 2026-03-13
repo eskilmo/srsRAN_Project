@@ -1,0 +1,75 @@
+# Build directories
+build/
+build-codeql/
+
+# CodeQL databases and results
+srsran-codeql-db*/
+codeql-*.sarif
+codeql-*.csv
+codeql-custom-queries-*/
+
+# CMake build files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+
+# IDE and editor files
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Compilation artifacts
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+
+# Test results and coverage
+*.gcov
+*.gcda
+*.gcno
+coverage/
+test_results/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.bak
+
+# Documentation build
+docs/_build/
+docs/build/
+
+# Configuration files that might contain local settings
+configs/local/
+*.local.conf
+
+# GDB history
+.gdb_history
+
+# Valgrind suppressions (keep original, ignore custom)
+*memcheck-suppressions
+
+# External build artifacts
+external/build/
+
+# Python cache if any
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Profiling data
+*.prof
+*.profile
+
+# Sanitizer outputs
+*.txt
