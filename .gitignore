@@ -46,6 +46,9 @@ test_results/
 docs/_build/
 docs/build/
 
+# SonarQube/SonarCloud analysis artifacts
+.scannerwork/
+
 # Configuration files that might contain local settings
 configs/local/
 *.local.conf
