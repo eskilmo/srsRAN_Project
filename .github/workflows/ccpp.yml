@@ -7,6 +7,8 @@
 #
 
 name: C/C++ CI
+permissions:
+  contents: read
 on: push
 jobs:
   x86_ubuntu_build:
