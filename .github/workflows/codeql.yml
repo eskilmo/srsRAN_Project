@@ -1,0 +1,67 @@
+name: "CodeQL Advanced (srsRAN)"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '34 23 * * 6'
+
+jobs:
+  analyze:
+    name: Analyze (CodeQL - C/C++)
+    runs-on: ubuntu-latest
+
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: c-cpp
+            build-mode: manual
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 🧱 Install dependencies required for srsRAN build
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            make \
+            gcc \
+            g++ \
+            libfftw3-dev \
+            libmbedtls-dev \
+            libboost-all-dev \
+            libuhd-dev || true
+
+      # 🔍 Initialize CodeQL with extended security suites
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: c-cpp
+          build-mode: manual
+          queries: +security-extended,security-and-quality
+
+      # 🏗️ Manual build (required for accurate analysis)
+      - name: Build project
+        run: |
+          mkdir -p build
+          cd build
+          cmake ..
+          make -j$(nproc)
+
+      # 🔎 Run CodeQL analysis
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:c-cpp"
