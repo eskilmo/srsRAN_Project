@@ -1,0 +1,56 @@
+name: SonarQube
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    name: Build and analyze
+    runs-on: ubuntu-latest
+    env:
+      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory
+
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+
+      - name: Install srsRAN dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake build-essential \
+            libfftw3-dev libmbedtls-dev \
+            libsctp-dev libyaml-cpp-dev \
+            libboost-all-dev
+
+      - name: Install Build Wrapper
+        uses: SonarSource/sonarqube-scan-action/install-build-wrapper@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
+
+      - name: Configure CMake
+        run: |
+          mkdir build && cd build
+          cmake .. \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Run Build Wrapper
+        run: |
+          cd build
+          build-wrapper-linux-x86-64 \
+            --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} \
+            make -j$(nproc)
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  # e.g. https://sonarqube.yourcompany.com
+        with:
+          args: >
+            -Dsonar.projectKey=srsRAN_project_analysis
+            -Dsonar.sources=lib,apps,include
+            -Dsonar.cfamily.compile-commands=build/${{ env.BUILD_WRAPPER_OUT_DIR }}/compile_commands.json
